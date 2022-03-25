@@ -1,8 +1,9 @@
 const request = require("request");
 const jssoup = require("jssoup").default;
+const symbol = process.argv[2];
 
-if (!process.argv[2]) {
-  throw "need to provide fund as an arguement `try calling : node index.js BM70SSF`";
+if (!symbol) {
+  throw "need to provide fund code as an arguement `try calling : node index.js BM70SSF`";
 }
 request(
   {
@@ -11,12 +12,14 @@ request(
   },
   function (_error, _response, body) {
     const soup = new jssoup(body);
-    const symbol = process.argv[2];
-
     const elems = soup.findAll("td");
     const found = elems.filter((elem) => {
       return elem.text.trim() === symbol;
     });
-    console.log(found[0].nextElement.nextElement.getText());
+    if (found.length) {
+      console.log(found[0]?.nextElement.nextElement.getText());
+    } else {
+      console.log(`${symbol} not found please try again with valid fund code`);
+    }
   }
 );
